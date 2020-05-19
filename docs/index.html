@@ -46,128 +46,86 @@ Previous versions of the Exposure time calulutaor on which this was built were;
    }
     </style>
 <h1> SAAO SPRAT<br>Exposure Time Calculator </h1>
+<center>
 
 
-    <center>
 
-         <h2 id="spectroscopy">Spectroscopy </h2>
+     <div id="spcurve_chart" style="width: 1000px; height: 600px"></div>
 
-         <br>
-         <p>To use the Exposure Time Calculator (ETC), select an
-            <i>Instrument</i> with a corresponding <i>Binning</i> (usually 2x2)
-            and <i>Filter</i> from the pull-down menus.  The <i>Plot Mode</i>
-            option is used to select whether the plot shows multiple <i>Signal to
-            Noise Ratios</i> (SNR), <i>Seeing Values</i> (FWHM) or <i>Sky Brightnesses</i>.
-            The comma separated list can be modified to the desired values.
-         </p>
+     <table>
+       <tr>
+         <td id="pulldn">Log x-Axis: </td>
+         <td>
+              <input type="radio" name="splogModeRadio" id="splogModeOff" value="" checked onchange="calcspec();"/>Off</>
+              <input type="radio" name="splogModeRadio" id="splogModeOn" value="log" onchange="calcspec();">On</></td>
+          <td id="pulldn">Plot Mode: </td>
+          <td>
+           <select name="spplotMode" id="spplotMode"  width="180" style="width: 180px" value="spseeMode" onchange="calcspec();">
+             <option value="spsnrMode">SNR</option>
+             <option value="spseeMode" selected="selected">Seeing</option>
+             <option value="spskyMode">Sky Brightness</option>
+           </select>
+       </tr>
+       <tr>
+           <td id="pulldn">Instrument: </td>
+           <td>
+             <select name="spectrometer" id="spinstrum"  width="260" style="width: 260px" onchange="calcspec();">
+                <option value="sprat">   SPRAT</option>
+             </select>
+           </td>
+           <td id="pulldn"> SNR: </td>
+          <td>
+            <input type="text" name="spsnrText" class="spconstraintTextInput" id="spsnrText" value="10, 25, 50, 100" onchange="calcspec();">
+            <input name="spsnrSlid" id="spsnrSlid" data-slider-id="spSlider" type="text" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="50" onchange="calcspec();"/>
+          </td>
+       </tr>
+       <tr>
 
-         <p><u>IMPORTANT NOTES:</u></p>
+          <td id="pulldn">Slit: </td>
+          <td>
+             <select name="slitwidth" id="spslit" width="260" style="width: 260px" onchange="calcspec();">
+                <option value="spratslit" class="sprat"> SPRAT 2 arcsec slit </option>
+             </select>
+          </td>
+          <td id="pulldn"> Seeing (arcsec): </td>
+          <td>
+            <input type="text" name="spseeText" class="spconstraintTextInput" id="spseeText" value="0.6, 1.2, 1.8, 2.4, 3.0" onchange="calcspec();">
+            <input name="spseeSlid" id="spseeSlid" data-slider-id="spSlider" type="text" data-slider-min="0.6" data-slider-max="4.0" data-slider-step="0.2" data-slider-value="1.2" onchange="calcspec();"/>
+          </td>
+       </tr>
+       <tr>
+          <td id="pulldn">Spectrometer arm: </td>
+          <td>
+             <select name="specarm" id="sparm" width="260" style="width: 260px"  onchange="calcspec();">
+                <option value="spredarm" class="sprat">  SPRAT Red region  </option>
+                <option value="spbluarm" class="sprat">  SPRAT Blue region </option>
+             </select>
+          </td>
+          <td>Sky Brightness: </td>
+          <td>
+              <input type="text" name="spskyText" class="spconstraintTextInput" id="spskyText" value="0, 2, 4, 6, 8" onchange="calcspec();">
+            <input name="spskySlid" id="spskySlid" data-slider-id="spSlider" type="text" data-slider-min="0" data-slider-max="10" data-slider-step="0.5" data-slider-value="2" onchange="calcspec();"/>
+          </td>
+        </tr>
+       </tr>
+     </table>
+     <br>
+     <table>
+       <tr>
+           <td>Magnitude Min</td>
+           <td>
+             <input id="spmagmin" size="4" type="number" value=12 onchange="calcspec();">
+         </td>
+         <td>Magnitude Max</td>
+         <td>
+            <input id="spmagmax" size="4" type="number" value=20 onchange="calcspec();">
+         </td>
+         <td>Exposure Time Max</td>
+         <td>
+            <input id="spexptmax" size="4" type="number" value=1200 min=200 step=200 onchange="calcspec();">
+         </td>
 
-         <ul>
-             <li><b>Mirror Reflectivity: </b> The zero points are derived with clean mirror coatings.
-                 Mirror reflectivity will naturally degrade over time. The IO:O ZP (two reflections)
-                 is measured to decline at a rate of 0.15mag per year. Other instruments (three reflections) are likely
-                 to decline slightly faster than that. The most recent mirror coating was Sept 2019.</li>
-             <li><b>Red and Blue wavelengths: </b> the exposure times listed below are
-             calculated close to the peak transmission of each arm/wavelength region,
-             corresponding to 450 nm and 700 nm in the blue and red, respectively. </li>
-             <li><b>SPRAT: </b> this version of the ETC does not take into account slit
-            losses with SPRAT; nor does it correct for the colour of a source. </li>
-         </ul>
-
-         <p>
-             Dark+10 mag corresponds to civil twilight (sun altitude < -4 degs),
-             Dark+6 mag to nautical twilight (sun altitude between -8 and -12 degs).
-             Roughly speaking, Dark+4 corresponds to observing >30 deg from a full moon;
-             Dark+2 to observing >30 deg from a 65% illuminated moon.
-            For further information on Sky Brightness and its relation to twilight, moon
-            phase and moon distance, see our
-         <a href="https://telescope.livjm.ac.uk/PropInst/Phase2/?sf=SkyBrightness">
-             Sky Brightness</a> webpage.
-         </p>
-
-         <p> If you have any problems with or questions about this ETC, please don't
-             hesitate to
-             <a href="https://telescope.livjm.ac.uk/Contact/"> contact us</a>.
-         </p>
-
-       <center>
-         <div id="spcurve_chart" style="width: 1000px; height: 600px"></div>
-
-         <table>
-           <tr>
-             <td id="pulldn">Log x-Axis: </td>
-             <td>
-                  <input type="radio" name="splogModeRadio" id="splogModeOff" value="" checked onchange="calcspec();"/>Off</>
-                  <input type="radio" name="splogModeRadio" id="splogModeOn" value="log" onchange="calcspec();">On</></td>
-              <td id="pulldn">Plot Mode: </td>
-              <td>
-               <select name="spplotMode" id="spplotMode"  width="180" style="width: 180px" value="spseeMode" onchange="calcspec();">
-                 <option value="spsnrMode">SNR</option>
-                 <option value="spseeMode" selected="selected">Seeing</option>
-                 <option value="spskyMode">Sky Brightness</option>
-               </select>
-           </tr>
-           <tr>
-               <td id="pulldn">Instrument: </td>
-               <td>
-                 <select name="spectrometer" id="spinstrum"  width="260" style="width: 260px" onchange="calcspec();">
-                    <option value="sprat">   SPRAT</option>
-                 </select>
-               </td>
-               <td id="pulldn"> SNR: </td>
-              <td>
-                <input type="text" name="spsnrText" class="spconstraintTextInput" id="spsnrText" value="10, 25, 50, 100" onchange="calcspec();">
-                <input name="spsnrSlid" id="spsnrSlid" data-slider-id="spSlider" type="text" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="50" onchange="calcspec();"/>
-              </td>
-           </tr>
-           <tr>
-
-              <td id="pulldn">Slit: </td>
-              <td>
-                 <select name="slitwidth" id="spslit" width="260" style="width: 260px" onchange="calcspec();">
-                    <option value="spratslit" class="sprat"> SPRAT 2 arcsec slit </option>
-                 </select>
-              </td>
-              <td id="pulldn"> Seeing (arcsec): </td>
-              <td>
-                <input type="text" name="spseeText" class="spconstraintTextInput" id="spseeText" value="0.6, 1.2, 1.8, 2.4, 3.0" onchange="calcspec();">
-                <input name="spseeSlid" id="spseeSlid" data-slider-id="spSlider" type="text" data-slider-min="0.6" data-slider-max="4.0" data-slider-step="0.2" data-slider-value="1.2" onchange="calcspec();"/>
-              </td>
-           </tr>
-           <tr>
-              <td id="pulldn">Spectrometer arm: </td>
-              <td>
-                 <select name="specarm" id="sparm" width="260" style="width: 260px"  onchange="calcspec();">
-                    <option value="spredarm" class="sprat">  SPRAT Red region  </option>
-                    <option value="spbluarm" class="sprat">  SPRAT Blue region </option>
-                 </select>
-              </td>
-              <td>Sky Brightness: </td>
-              <td>
-                  <input type="text" name="spskyText" class="spconstraintTextInput" id="spskyText" value="0, 2, 4, 6, 8" onchange="calcspec();">
-                <input name="spskySlid" id="spskySlid" data-slider-id="spSlider" type="text" data-slider-min="0" data-slider-max="10" data-slider-step="0.5" data-slider-value="2" onchange="calcspec();"/>
-              </td>
-            </tr>
-           </tr>
-         </table>
-         <br>
-         <table>
-           <tr>
-               <td>Magnitude Min</td>
-               <td>
-                 <input id="spmagmin" size="4" type="number" value=12 onchange="calcspec();">
-             </td>
-             <td>Magnitude Max</td>
-             <td>
-                <input id="spmagmax" size="4" type="number" value=20 onchange="calcspec();">
-             </td>
-             <td>Exposure Time Max</td>
-             <td>
-                <input id="spexptmax" size="4" type="number" value=1200 min=200 step=200 onchange="calcspec();">
-             </td>
-
-         </table>
+     </table>
 
 <br><br>
 
